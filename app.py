@@ -396,6 +396,10 @@ def main():
                 color_continuous_scale='RdYlGn_r',
                 title=f"Migration Intensity by District ({selected_state})"
             )
+            fig_treemap.update_traces(
+                textfont=dict(color='white', size=14),
+                marker=dict(line=dict(width=2, color='white'))
+            )
             fig_treemap.update_layout(height=600)
             st.plotly_chart(fig_treemap, use_container_width=True)
             
