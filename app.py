@@ -369,9 +369,7 @@ def main():
     
     st.markdown("---")
     
-    # ========================================================================
-    # TABS
-    # ========================================================================
+   
     tab1, tab2, tab3, tab4 = st.tabs([
         "🌍 Migration Monitor",
         "⚠️ Risk Assessment",
@@ -397,7 +395,7 @@ def main():
                 title=f"Migration Intensity by District ({selected_state})"
             )
             fig_treemap.update_traces(
-                textfont=dict(color='white', size=14),
+                textfont=dict(size=14, color='white', family='Arial Black'),
                 marker=dict(line=dict(width=2, color='white'))
             )
             fig_treemap.update_layout(height=600)
