@@ -395,10 +395,18 @@ def main():
                 title=f"Migration Intensity by District ({selected_state})"
             )
             fig_treemap.update_traces(
-                textfont=dict(size=14, color='white', family='Arial Black'),
-                marker=dict(line=dict(width=2, color='white'))
+                textfont=dict(size=16, color='white', family='Arial Black'),
+                textposition='middle center',
+                marker=dict(
+                    line=dict(width=2, color='white'),
+                    colorbar=dict(thickness=15, len=0.7)
+                ),
+                insidetextfont=dict(size=16, color='white', family='Arial Black')
             )
-            fig_treemap.update_layout(height=600)
+            fig_treemap.update_layout(
+                height=600,
+                font=dict(size=16, color='white', family='Arial Black')
+            )
             st.plotly_chart(fig_treemap, use_container_width=True)
             
             # Top migration districts
