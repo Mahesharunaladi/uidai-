@@ -10,6 +10,10 @@ import plotly.graph_objects as go
 from scipy.stats.mstats import winsorize
 import numpy as np
 from pathlib import Path
+import hashlib
+import json
+import os
+from datetime import datetime
 
 # ============================================================================
 # PAGE CONFIGURATION
@@ -125,8 +129,174 @@ st.markdown("""
         background-color: #e6f3ff;
         border-color: #0066cc;
     }
+    
+    /* Login/Register Form Styling */
+    .login-container {
+        max-width: 450px;
+        margin: 50px auto;
+        padding: 40px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    }
+    
+    .login-header {
+        text-align: center;
+        color: #000080;
+        font-size: 2em;
+        font-weight: bold;
+        margin-bottom: 30px;
+    }
+    
+    .stButton>button {
+        width: 100%;
+        background: linear-gradient(90deg, #FF9933 0%, #138808 100%);
+        color: white;
+        font-weight: bold;
+        border: none;
+        padding: 12px;
+        border-radius: 5px;
+    }
 </style>
 """, unsafe_allow_html=True)
+
+# ============================================================================
+# AUTHENTICATION SYSTEM
+# ============================================================================
+
+# Initialize session state for authentication
+if 'authenticated' not in st.session_state:
+    st.session_state.authenticated = False
+if 'username' not in st.session_state:
+    st.session_state.username = None
+if 'user_role' not in st.session_state:
+    st.session_state.user_role = None
+
+# User database file
+USER_DB_FILE = "user_database.json"
+
+def hash_password(password):
+    """Hash password using SHA-256"""
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def load_users():
+    """Load users from JSON file"""
+    if os.path.exists(USER_DB_FILE):
+        with open(USER_DB_FILE, 'r') as f:
+            return json.load(f)
+    return {}
+
+def save_users(users):
+    """Save users to JSON file"""
+    with open(USER_DB_FILE, 'w') as f:
+        json.dump(users, f, indent=4)
+
+def register_user(username, password, email, role="user"):
+    """Register a new user"""
+    users = load_users()
+    
+    if username in users:
+        return False, "Username already exists!"
+    
+    users[username] = {
+        "password": hash_password(password),
+        "email": email,
+        "role": role,
+        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
+    
+    save_users(users)
+    return True, "Registration successful! Please login."
+
+def authenticate_user(username, password):
+    """Authenticate user credentials"""
+    users = load_users()
+    
+    if username not in users:
+        return False, "Username not found!"
+    
+    if users[username]["password"] == hash_password(password):
+        return True, users[username]["role"]
+    
+    return False, "Incorrect password!"
+
+def logout():
+    """Logout user"""
+    st.session_state.authenticated = False
+    st.session_state.username = None
+    st.session_state.user_role = None
+
+def show_login_page():
+    """Display login and registration page"""
+    st.markdown("""
+        <div style='text-align: center; margin-bottom: 30px;'>
+            <div class='main-header'>
+                <h1 class='main-title'>🇮🇳 Aadhaar Pulse - UIDAI Dashboard</h1>
+                <p class='main-subtitle'>Real-time Command Center for Resident Lifecycle Monitoring</p>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    # Create tabs for Login and Register
+    tab1, tab2 = st.tabs(["🔐 Login", "📝 Register"])
+    
+    # LOGIN TAB
+    with tab1:
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.markdown("<div class='login-header'>Login to Dashboard</div>", unsafe_allow_html=True)
+            
+            with st.form("login_form"):
+                username = st.text_input("Username", placeholder="Enter your username")
+                password = st.text_input("Password", type="password", placeholder="Enter your password")
+                submit = st.form_submit_button("🔓 Login")
+                
+                if submit:
+                    if username and password:
+                        success, result = authenticate_user(username, password)
+                        if success:
+                            st.session_state.authenticated = True
+                            st.session_state.username = username
+                            st.session_state.user_role = result
+                            st.success(f"✅ Welcome back, {username}!")
+                            st.rerun()
+                        else:
+                            st.error(f"❌ {result}")
+                    else:
+                        st.warning("⚠️ Please enter both username and password")
+    
+    # REGISTER TAB
+    with tab2:
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.markdown("<div class='login-header'>Create New Account</div>", unsafe_allow_html=True)
+            
+            with st.form("register_form"):
+                new_username = st.text_input("Username", placeholder="Choose a username")
+                new_email = st.text_input("Email", placeholder="Enter your email")
+                new_password = st.text_input("Password", type="password", placeholder="Create a password")
+                confirm_password = st.text_input("Confirm Password", type="password", placeholder="Confirm your password")
+                role = st.selectbox("Role", ["user", "admin", "analyst"])
+                register = st.form_submit_button("📝 Register")
+                
+                if register:
+                    if new_username and new_email and new_password and confirm_password:
+                        if new_password != confirm_password:
+                            st.error("❌ Passwords do not match!")
+                        elif len(new_password) < 6:
+                            st.error("❌ Password must be at least 6 characters long!")
+                        else:
+                            success, message = register_user(new_username, new_password, new_email, role)
+                            if success:
+                                st.success(f"✅ {message}")
+                            else:
+                                st.error(f"❌ {message}")
+                    else:
+                        st.warning("⚠️ Please fill in all fields")
+    
+    # Info section
+    st.markdown("---")
+    st.info("🔒 **Secure Access**: All passwords are encrypted using SHA-256 hashing. Your credentials are stored securely.")
 
 # ============================================================================
 # DATA LOADING & CLEANING
