@@ -441,6 +441,15 @@ def main():
     # SIDEBAR CONTROLS
     # ========================================================================
     with st.sidebar:
+        # User info and logout
+        st.markdown(f"### 👤 Welcome, {st.session_state.username}!")
+        st.markdown(f"**Role:** {st.session_state.user_role.upper()}")
+        
+        if st.button("🚪 Logout"):
+            logout()
+            st.rerun()
+        
+        st.markdown("---")
         st.markdown("### 🎛️ Control Panel")
         st.markdown("---")
         
@@ -733,4 +742,8 @@ def main():
     """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
-    main()
+    # Check authentication status
+    if not st.session_state.authenticated:
+        show_login_page()
+    else:
+        main()
