@@ -12,6 +12,7 @@
 
 ## 📌 Highlights
 
+- **🔐 Secure Authentication**: User login and registration system with role-based access control
 - **Authoritative UI**: Streamlit dashboard skinned as an official UIDAI portal with the Indian emblem, Aadhaar branding, textured background, and gov-style KPI cards.
 - **Smart analytics**: Winsorized metrics, dual-risk scoring, and a rule-based AI assistant that answers questions about risks, states, and definitions.
 - **Actionable visuals**: Migration treemap, risk matrix, digital divide heatmap, and raw-data explorer with CSV export.
@@ -23,7 +24,9 @@
 
 ```
 UIDAI-hackathon-/
-├─ app.py                          # Streamlit dashboard
+├─ app.py                          # Streamlit dashboard with authentication
+├─ create_admin.py                 # Script to create initial admin users
+├─ user_database.json              # User credentials database (auto-generated)
 ├─ scripts/
 │   └─ generate_uidai_report.py    # PDF report builder (Pandas + Matplotlib + ReportLab)
 ├─ src/
@@ -33,9 +36,26 @@ UIDAI-hackathon-/
 │   ├─ UIDAI_Pulse_Report.pdf      # Generated consolidated report
 │   └─ report_assets/              # Charts embedded in the PDF
 ├─ requirements.txt                # Python dependencies
+├─ AUTH_README.md                  # Authentication system documentation
 ├─ .gitignore                      # Git ignore rules
 └─ README.md                       # You are here
 ```
+
+---
+
+## 🔐 Quick Start - Login Credentials
+
+**Default Admin Account:**
+- Username: `admin`
+- Password: `admin123`
+
+**Default Demo Account:**
+- Username: `demo`
+- Password: `demo123`
+
+⚠️ **Change these passwords after first login!**
+
+For detailed authentication documentation, see [AUTH_README.md](AUTH_README.md)
 
 ---
 
