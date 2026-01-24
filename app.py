@@ -166,6 +166,26 @@ st.markdown("""
         padding: 12px;
         border-radius: 5px;
     }
+    
+    /* Input fields styling - white background */
+    .stTextInput>div>div>input {
+        background-color: white !important;
+        color: black !important;
+        border: 2px solid #ddd !important;
+        border-radius: 5px !important;
+        padding: 10px !important;
+    }
+    
+    .stTextInput>div>div>input:focus {
+        border-color: #FF9933 !important;
+        box-shadow: 0 0 0 2px rgba(255, 153, 51, 0.2) !important;
+    }
+    
+    /* Input labels */
+    .stTextInput>label {
+        color: #000080 !important;
+        font-weight: bold !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
