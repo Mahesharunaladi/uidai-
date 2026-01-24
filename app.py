@@ -100,11 +100,20 @@ st.markdown("""
         border-radius: 5px 5px 0 0;
         padding: 10px 20px;
         font-weight: bold;
+        color: black;
     }
     
     .stTabs [aria-selected="true"] {
         background-color: #FF9933;
         color: white;
+    }
+    
+    /* Tab content area - white background */
+    .stTabs [data-baseweb="tab-panel"] {
+        background-color: white;
+        padding: 30px;
+        border-radius: 0 0 10px 10px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
     
     /* Alert boxes */
