@@ -22,5 +22,11 @@
         "email": "vikas@gamil.com",
         "role": "user",
         "created_at": "2026-01-24 23:53:52"
+    },
+    "vikas rai": {
+        "password": "e24df920078c3dd4e7e8d2442f00e5c9ab2a231bb3918d65cc50906e49ecaef4",
+        "email": "vikasraikar07@gmail.com",
+        "role": "admin",
+        "created_at": "2026-01-25 00:25:09"
     }
 }
