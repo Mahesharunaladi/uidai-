@@ -182,6 +182,20 @@ st.markdown("""
         color: #000080 !important;
         font-weight: bold !important;
     }
+    
+    /* Treemap text visibility enhancement */
+    .js-plotly-plot .plotly text {
+        text-shadow: 
+            -1px -1px 0 white,
+            1px -1px 0 white,
+            -1px 1px 0 white,
+            1px 1px 0 white,
+            -2px 0 0 white,
+            2px 0 0 white,
+            0 -2px 0 white,
+            0 2px 0 white !important;
+        font-weight: 900 !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -587,27 +601,23 @@ def main():
             )
             fig_treemap.update_traces(
                 textfont=dict(
-                    size=18, 
-                    color='white', 
+                    size=14, 
+                    color='black', 
                     family='Arial Black, sans-serif'
                 ),
                 textposition='middle center',
                 marker=dict(
                     line=dict(width=3, color='white'),
-                    colorbar=dict(thickness=15, len=0.7)
+                    colorbar=dict(thickness=15, len=0.7),
+                    # Add padding for text
+                    pad=dict(t=20, l=10, r=10, b=10)
                 ),
-                insidetextfont=dict(
-                    size=18, 
-                    color='white', 
-                    family='Arial Black, sans-serif'
-                ),
-                # Add text outline for better visibility
+                # Use black text for better visibility on all backgrounds
                 texttemplate='<b>%{label}</b>',
             )
             fig_treemap.update_layout(
                 height=600,
-                font=dict(size=18, color='white', family='Arial Black, sans-serif'),
-                # Add better contrast
+                font=dict(size=14, color='black', family='Arial Black, sans-serif'),
                 paper_bgcolor='rgba(0,0,0,0)',
                 plot_bgcolor='rgba(0,0,0,0)'
             )
