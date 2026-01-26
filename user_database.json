@@ -28,5 +28,17 @@
         "email": "vikasraikar07@gmail.com",
         "role": "admin",
         "created_at": "2026-01-25 00:25:09"
+    },
+    "Lohith h h": {
+        "password": "8a9bcf1e51e812d0af8465a8dbcc9f741064bf0af3b3d08e6b0246437c19f7fb",
+        "email": "lohith@gmail.com",
+        "role": "admin",
+        "created_at": "2026-01-26 21:45:32"
+    },
+    "Lohith h ": {
+        "password": "8a9bcf1e51e812d0af8465a8dbcc9f741064bf0af3b3d08e6b0246437c19f7fb",
+        "email": "lohithh@gmail.com",
+        "role": "user",
+        "created_at": "2026-01-26 21:45:48"
     }
 }
