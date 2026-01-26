@@ -502,9 +502,11 @@ def main():
             0, 100, (0, 100)
         )
         
-        # Comparison mode
-        st.markdown("#### 🔍 Analysis Mode")
-        comparison_mode = st.checkbox("Enable State Comparison", value=False)
+        # Admin-only features
+        if st.session_state.user_role == 'admin':
+            # Comparison mode (admin only)
+            st.markdown("#### 🔍 Analysis Mode")
+            comparison_mode = st.checkbox("Enable State Comparison", value=False)
         
         st.markdown("---")
         
@@ -517,16 +519,17 @@ def main():
         
         st.markdown("---")
         
-        # Export
-        st.markdown("#### 📥 Export Data")
-        if st.button("Download Filtered CSV"):
-            csv = df.to_csv(index=False)
-            st.download_button(
-                label="💾 Download CSV",
-                data=csv,
-                file_name="uidai_filtered_data.csv",
-                mime="text/csv"
-            )
+        # Export (admin only)
+        if st.session_state.user_role == 'admin':
+            st.markdown("#### 📥 Export Data")
+            if st.button("Download Filtered CSV"):
+                csv = df.to_csv(index=False)
+                st.download_button(
+                    label="💾 Download CSV",
+                    data=csv,
+                    file_name="uidai_filtered_data.csv",
+                    mime="text/csv"
+                )
     
 
     filtered_df = df.copy()
