@@ -619,35 +619,33 @@ def main():
             )
             fig_treemap.update_traces(
                 textfont=dict(
-                    size=14, 
+                    size=16, 
                     color='black', 
-                    family='Arial Black, sans-serif'
+                    family='Arial, Helvetica, sans-serif'
                 ),
                 textposition='middle center',
                 marker=dict(
-                    line=dict(width=3, color='white'),
+                    line=dict(width=2, color='white'),
                     colorbar=dict(thickness=15, len=0.7),
-                    # Add padding for text
                     pad=dict(t=20, l=10, r=10, b=10)
                 ),
-                # Use black text for better visibility on all backgrounds
                 texttemplate='<b>%{label}</b>',
             )
             fig_treemap.update_layout(
                 height=600,
-                font=dict(size=14, color='black', family='Arial Black, sans-serif'),
-                paper_bgcolor='rgba(0,0,0,0)',
-                plot_bgcolor='rgba(0,0,0,0)',
+                font=dict(size=16, color='black', family='Arial, Helvetica, sans-serif'),
+                paper_bgcolor='white',
+                plot_bgcolor='white',
                 title=dict(
                     text=f"Migration Intensity by District ({selected_state})",
-                    font=dict(size=24, color='#000080', family='Arial Black, sans-serif'),
+                    font=dict(size=24, color='#000080', family='Arial, Helvetica, sans-serif', weight='bold'),
                     x=0.5,
                     xanchor='center',
                     y=0.98,
                     yanchor='top'
                 )
             )
-            st.plotly_chart(fig_treemap, use_container_width=True)
+            st.plotly_chart(fig_treemap, use_container_width=True, config={'displayModeBar': True})
             
             # Top migration districts
             st.markdown("#### 🔝 Top 10 High Migration Districts")
