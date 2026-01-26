@@ -656,134 +656,183 @@ def main():
             st.warning("No data available for selected filters.")
     
     # ------------------------------------------------------------------------
-    # TAB 2: RISK ASSESSMENT
+    # TAB 2: CONDITIONAL CONTENT BASED ON ROLE
     # ------------------------------------------------------------------------
     with tab2:
-        st.markdown("### ⚠️ Dual-Risk Matrix")
-        st.markdown("Migration vs Biometric Lag - sized by risk score, colored by digital penetration")
-        
-        if len(filtered_df) > 0:
-            # Risk scatter plot
-            fig_scatter = px.scatter(
-                filtered_df,
-                x='Migration_Intensity',
-                y='Biometric_Lag',
-                size='Risk_Score',
-                color='Digital_Penetration',
-                hover_data=['State', 'District', 'Risk_Score'],
-                color_continuous_scale='RdYlGn',
-                title="Risk Assessment Matrix"
-            )
+        if st.session_state.user_role == 'admin':
+            # ADMIN: Risk Assessment
+            st.markdown("### ⚠️ Dual-Risk Matrix")
+            st.markdown("Migration vs Biometric Lag - sized by risk score, colored by digital penetration")
             
-            # Add quadrant lines
-            fig_scatter.add_hline(y=70, line_dash="dash", line_color="red", opacity=0.5)
-            fig_scatter.add_vline(x=70, line_dash="dash", line_color="red", opacity=0.5)
-            
-            fig_scatter.update_layout(height=600)
-            st.plotly_chart(fig_scatter, use_container_width=True)
-            
-            # Risk alerts
-            critical = filtered_df[
-                (filtered_df['Migration_Intensity'] > 70) & 
-                (filtered_df['Biometric_Lag'] > 70)
-            ]
-            
-            if len(critical) > 0:
-                st.markdown("""
-                <div class="alert-box alert-critical">
-                    <strong>🚨 CRITICAL ALERT:</strong> {} districts exceed BOTH 70% migration intensity 
-                    AND 70% biometric lag. Immediate deployment of mobile enrolment kits recommended.
-                </div>
-                """.format(len(critical)), unsafe_allow_html=True)
-                
-                st.dataframe(
-                    critical[['State', 'District', 'Migration_Intensity', 'Biometric_Lag', 'Risk_Score']],
-                    use_container_width=True
+            if len(filtered_df) > 0:
+                # Risk scatter plot
+                fig_scatter = px.scatter(
+                    filtered_df,
+                    x='Migration_Intensity',
+                    y='Biometric_Lag',
+                    size='Risk_Score',
+                    color='Digital_Penetration',
+                    hover_data=['State', 'District', 'Risk_Score'],
+                    color_continuous_scale='RdYlGn',
+                    title="Risk Assessment Matrix"
                 )
+                
+                # Add quadrant lines
+                fig_scatter.add_hline(y=70, line_dash="dash", line_color="red", opacity=0.5)
+                fig_scatter.add_vline(x=70, line_dash="dash", line_color="red", opacity=0.5)
+                
+                fig_scatter.update_layout(height=600)
+                st.plotly_chart(fig_scatter, use_container_width=True)
+                
+                # Risk alerts
+                critical = filtered_df[
+                    (filtered_df['Migration_Intensity'] > 70) & 
+                    (filtered_df['Biometric_Lag'] > 70)
+                ]
+                
+                if len(critical) > 0:
+                    st.markdown("""
+                    <div class="alert-box alert-critical">
+                        <strong>🚨 CRITICAL ALERT:</strong> {} districts exceed BOTH 70% migration intensity 
+                        AND 70% biometric lag. Immediate deployment of mobile enrolment kits recommended.
+                    </div>
+                    """.format(len(critical)), unsafe_allow_html=True)
+                    
+                    st.dataframe(
+                        critical[['State', 'District', 'Migration_Intensity', 'Biometric_Lag', 'Risk_Score']],
+                        use_container_width=True
+                    )
+            else:
+                st.warning("No data available for selected filters.")
         else:
-            st.warning("No data available for selected filters.")
-    
-    # ------------------------------------------------------------------------
-    # TAB 3: DIGITAL DIVIDE
-    # ------------------------------------------------------------------------
-    with tab3:
-        st.markdown("### 📱 Digital Penetration Heatmap")
-        st.markdown("Identifying districts with lowest mobile linkage and digital readiness")
-        
-        if len(filtered_df) > 0:
-            # State-level aggregation
-            state_digital = filtered_df.groupby('State').agg({
-                'Digital_Penetration': 'mean',
-                'Mobile_Linkage_Rate': 'mean',
-                'District': 'count'
-            }).reset_index()
-            state_digital.columns = ['State', 'Avg_Digital_Penetration', 'Avg_Mobile_Linkage', 'District_Count']
-            state_digital = state_digital.sort_values('Avg_Digital_Penetration')
+            # USER: Simple Dashboard
+            st.markdown("### 📊 My Dashboard")
+            st.markdown("Overview of migration statistics and key metrics")
             
-            # Bar chart
-            fig_bar = px.bar(
-                state_digital,
-                x='State',
-                y='Avg_Digital_Penetration',
-                color='Avg_Digital_Penetration',
-                color_continuous_scale='RdYlGn',
-                title="Average Digital Penetration by State"
+            if len(filtered_df) > 0:
+                # Summary statistics for users
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    avg_migration = filtered_df['Migration_Intensity'].mean()
+                    st.metric("Average Migration Intensity", f"{avg_migration:.1f}%")
+                    
+                    total_districts = len(filtered_df)
+                    st.metric("Total Districts", f"{total_districts:,}")
+                
+                with col2:
+                    high_migration = len(filtered_df[filtered_df['Migration_Intensity'] > 70])
+                    st.metric("High Migration Districts", f"{high_migration:,}")
+                    
+                    total_enrol = filtered_df['Total_Enrolment'].sum()
+                    st.metric("Total Enrolments", f"{total_enrol:,.0f}")
+                
+                st.markdown("---")
+                
+                # Migration trend chart for users
+                st.markdown("#### 📈 Migration Intensity Distribution")
+                fig_hist = px.histogram(
+                    filtered_df,
+                    x='Migration_Intensity',
+                    nbins=20,
+                    title="Distribution of Migration Intensity",
+                    labels={'Migration_Intensity': 'Migration Intensity (%)'}
+                )
+                fig_hist.update_layout(height=400, showlegend=False)
+                st.plotly_chart(fig_hist, use_container_width=True)
+                
+                # Top 5 districts for users
+                st.markdown("#### 🔝 Top 5 Districts by Migration")
+                top_5 = filtered_df.nlargest(5, 'Migration_Intensity')[
+                    ['District', 'State', 'Migration_Intensity', 'Total_Enrolment']
+                ]
+                st.dataframe(top_5, use_container_width=True, hide_index=True)
+            else:
+                st.warning("No data available for selected filters.")
+    
+    # Admin-only tabs
+    if st.session_state.user_role == 'admin':
+        # ------------------------------------------------------------------------
+        # TAB 3: DIGITAL DIVIDE (ADMIN ONLY)
+        # ------------------------------------------------------------------------
+        with tab3:
+            st.markdown("### 📱 Digital Penetration Heatmap")
+            st.markdown("Identifying districts with lowest mobile linkage and digital readiness")
+            
+            if len(filtered_df) > 0:
+                # State-level aggregation
+                state_digital = filtered_df.groupby('State').agg({
+                    'Digital_Penetration': 'mean',
+                    'Mobile_Linkage_Rate': 'mean',
+                    'District': 'count'
+                }).reset_index()
+                state_digital.columns = ['State', 'Avg_Digital_Penetration', 'Avg_Mobile_Linkage', 'District_Count']
+                state_digital = state_digital.sort_values('Avg_Digital_Penetration')
+                
+                # Bar chart
+                fig_bar = px.bar(
+                    state_digital,
+                    x='State',
+                    y='Avg_Digital_Penetration',
+                    color='Avg_Digital_Penetration',
+                    color_continuous_scale='RdYlGn',
+                    title="Average Digital Penetration by State"
+                )
+                fig_bar.update_layout(height=500, xaxis_tickangle=-45)
+                st.plotly_chart(fig_bar, use_container_width=True)
+                
+                # Bottom 5 states
+                st.markdown("#### 📉 Bottom 5 States - Digital Dark Spots")
+                bottom_states = state_digital.head(5)
+                
+                st.markdown("""
+                <div class="alert-box alert-warning">
+                    <strong>⚠️ ATTENTION:</strong> These states require IVRS reminders, 
+                    offline grievance desks, and assisted Aadhaar update facilities.
+                </div>
+                """, unsafe_allow_html=True)
+                
+                st.dataframe(bottom_states, use_container_width=True)
+            else:
+                st.warning("No data available for selected filters.")
+        
+        # ------------------------------------------------------------------------
+        # TAB 4: RAW DATA (ADMIN ONLY)
+        # ------------------------------------------------------------------------
+        with tab4:
+            st.markdown("### 📋 Filtered Data Explorer")
+            st.markdown(f"Showing **{len(filtered_df)}** records")
+            
+            # Display options
+            col1, col2 = st.columns([3, 1])
+            with col1:
+                search_term = st.text_input("🔍 Search districts:", placeholder="Type to filter...")
+            with col2:
+                rows_to_show = st.selectbox("Rows per page:", [10, 25, 50, 100], index=1)
+            
+            # Filter by search
+            display_df = filtered_df
+            if search_term:
+                display_df = display_df[
+                    display_df['District'].str.contains(search_term, case=False) |
+                    display_df['State'].str.contains(search_term, case=False)
+                ]
+            
+            # Display dataframe
+            st.dataframe(
+                display_df.head(rows_to_show),
+                use_container_width=True,
+                height=400
             )
-            fig_bar.update_layout(height=500, xaxis_tickangle=-45)
-            st.plotly_chart(fig_bar, use_container_width=True)
             
-            # Bottom 5 states
-            st.markdown("#### 📉 Bottom 5 States - Digital Dark Spots")
-            bottom_states = state_digital.head(5)
-            
-            st.markdown("""
-            <div class="alert-box alert-warning">
-                <strong>⚠️ ATTENTION:</strong> These states require IVRS reminders, 
-                offline grievance desks, and assisted Aadhaar update facilities.
-            </div>
-            """, unsafe_allow_html=True)
-            
-            st.dataframe(bottom_states, use_container_width=True)
-        else:
-            st.warning("No data available for selected filters.")
-    
-    # ------------------------------------------------------------------------
-    # TAB 4: RAW DATA
-    # ------------------------------------------------------------------------
-    with tab4:
-        st.markdown("### 📋 Filtered Data Explorer")
-        st.markdown(f"Showing **{len(filtered_df)}** records")
-        
-        # Display options
-        col1, col2 = st.columns([3, 1])
-        with col1:
-            search_term = st.text_input("🔍 Search districts:", placeholder="Type to filter...")
-        with col2:
-            rows_to_show = st.selectbox("Rows per page:", [10, 25, 50, 100], index=1)
-        
-        # Filter by search
-        display_df = filtered_df
-        if search_term:
-            display_df = display_df[
-                display_df['District'].str.contains(search_term, case=False) |
-                display_df['State'].str.contains(search_term, case=False)
-            ]
-        
-        # Display dataframe
-        st.dataframe(
-            display_df.head(rows_to_show),
-            use_container_width=True,
-            height=400
-        )
-        
-        # Export button
-        csv = display_df.to_csv(index=False)
-        st.download_button(
-            label="📥 Download Full Filtered Data",
-            data=csv,
-            file_name=f"uidai_export_{selected_state.replace(' ', '_').lower()}.csv",
-            mime="text/csv"
-        )
+            # Export button
+            csv = display_df.to_csv(index=False)
+            st.download_button(
+                label="📥 Download Full Filtered Data",
+                data=csv,
+                file_name=f"uidai_export_{selected_state.replace(' ', '_').lower()}.csv",
+                mime="text/csv"
+            )
     
     # ========================================================================
     # FOOTER
