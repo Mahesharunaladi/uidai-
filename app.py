@@ -15,9 +15,7 @@ import json
 import os
 from datetime import datetime
 
-# ============================================================================
-# PAGE CONFIGURATION
-# ============================================================================
+
 st.set_page_config(
     page_title="Aadhaar Pulse - UIDAI Dashboard",
     page_icon="🇮🇳",
@@ -25,9 +23,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ============================================================================
-# CUSTOM CSS - UIDAI BRANDING
-# ============================================================================
+
 st.markdown("""
 <style>
     /* Main background with texture */
@@ -189,9 +185,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ============================================================================
-# AUTHENTICATION SYSTEM
-# ============================================================================
+
 
 # Initialize session state for authentication
 if 'authenticated' not in st.session_state:
@@ -394,9 +388,7 @@ def load_and_clean_data():
     
     return df
 
-# ============================================================================
-# AI ASSISTANT (RULE-BASED)
-# ============================================================================
+
 def ai_assistant(query, df):
     """Rule-based AI assistant for answering questions about the data"""
     query = query.lower()
@@ -450,9 +442,6 @@ def ai_assistant(query, df):
     else:
         return "🤔 I didn't understand that. Try asking about 'highest risk', 'digital divide', 'migration', or type 'help' for more options."
 
-# ============================================================================
-# MAIN APPLICATION
-# ============================================================================
 def main():
     # Header
     st.markdown("""
@@ -466,9 +455,7 @@ def main():
     with st.spinner("🔄 Loading and cleaning UIDAI data..."):
         df = load_and_clean_data()
     
-    # ========================================================================
-    # SIDEBAR CONTROLS
-    # ========================================================================
+    
     with st.sidebar:
         # User info and logout
         st.markdown(f"### 👤 Welcome, {st.session_state.username}!")
@@ -520,9 +507,7 @@ def main():
                 mime="text/csv"
             )
     
-    # ========================================================================
-    # FILTER DATA
-    # ========================================================================
+
     filtered_df = df.copy()
     
     if selected_state != 'All India':
@@ -533,9 +518,7 @@ def main():
         (filtered_df['Migration_Intensity'] <= migration_range[1])
     ]
     
-    # ========================================================================
-    # KPI CARDS
-    # ========================================================================
+   
     st.markdown("### 📊 Key Performance Indicators")
     
     col1, col2, col3, col4 = st.columns(4)
@@ -603,17 +586,30 @@ def main():
                 title=f"Migration Intensity by District ({selected_state})"
             )
             fig_treemap.update_traces(
-                textfont=dict(size=16, color='white', family='Arial Black'),
+                textfont=dict(
+                    size=18, 
+                    color='white', 
+                    family='Arial Black, sans-serif'
+                ),
                 textposition='middle center',
                 marker=dict(
-                    line=dict(width=2, color='white'),
+                    line=dict(width=3, color='white'),
                     colorbar=dict(thickness=15, len=0.7)
                 ),
-                insidetextfont=dict(size=16, color='white', family='Arial Black')
+                insidetextfont=dict(
+                    size=18, 
+                    color='white', 
+                    family='Arial Black, sans-serif'
+                ),
+                # Add text outline for better visibility
+                texttemplate='<b>%{label}</b>',
             )
             fig_treemap.update_layout(
                 height=600,
-                font=dict(size=16, color='white', family='Arial Black')
+                font=dict(size=18, color='white', family='Arial Black, sans-serif'),
+                # Add better contrast
+                paper_bgcolor='rgba(0,0,0,0)',
+                plot_bgcolor='rgba(0,0,0,0)'
             )
             st.plotly_chart(fig_treemap, use_container_width=True)
             
