@@ -196,6 +196,13 @@ st.markdown("""
             0 2px 0 white !important;
         font-weight: 900 !important;
     }
+    
+    /* Make all headings in tab panels black */
+    .stTabs [data-baseweb="tab-panel"] h3,
+    .stTabs [data-baseweb="tab-panel"] h4,
+    .stTabs [data-baseweb="tab-panel"] p {
+        color: black !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -574,13 +581,21 @@ def main():
     
     st.markdown("---")
     
-   
-    tab1, tab2, tab3, tab4 = st.tabs([
-        "🌍 Migration Monitor",
-        "⚠️ Risk Assessment",
-        "📉 Digital Divide",
-        "🗂️ Raw Data"
-    ])
+    # Role-based tab access
+    if st.session_state.user_role == 'admin':
+        # Admin sees all tabs
+        tab1, tab2, tab3, tab4 = st.tabs([
+            "🌍 Migration Monitor",
+            "⚠️ Risk Assessment",
+            "📉 Digital Divide",
+            "🗂️ Raw Data"
+        ])
+    else:
+        # Regular users see limited tabs
+        tab1, tab2 = st.tabs([
+            "🌍 Migration Monitor",
+            "📊 My Dashboard"
+        ])
     
     # ------------------------------------------------------------------------
     # TAB 1: MIGRATION MONITOR
@@ -619,7 +634,15 @@ def main():
                 height=600,
                 font=dict(size=14, color='black', family='Arial Black, sans-serif'),
                 paper_bgcolor='rgba(0,0,0,0)',
-                plot_bgcolor='rgba(0,0,0,0)'
+                plot_bgcolor='rgba(0,0,0,0)',
+                title=dict(
+                    text=f"Migration Intensity by District ({selected_state})",
+                    font=dict(size=24, color='#000080', family='Arial Black, sans-serif'),
+                    x=0.5,
+                    xanchor='center',
+                    y=0.98,
+                    yanchor='top'
+                )
             )
             st.plotly_chart(fig_treemap, use_container_width=True)
             
